@@ -1,0 +1,209 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="/css/index.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+  <script src="https://code.angularjs.org/1.8.0/angular-route.min.js"></script>
+
+  <title>Hello, world!</title>
+  <style>
+    header {
+      height: 200px;
+    }
+
+    nav.row {
+      height: 60px;
+      background-color: yellow;
+    }
+
+    footer {
+      height: 50px;
+      background-color: grey;
+    }
+
+    .row>article {
+      min-height: 300px;
+    }
+
+    .row>aside {
+      min-height: 300px;
+    }
+  </style>
+</head>
+
+<body ng-app="lab8" ng-controller="lab8">
+  <div class="container">
+    <header class="row">
+      <img class="ml-auto w-100" src="/images/banner.png">
+    </header>
+    <nav class="row" ng-include="'menu1.html'">
+    </nav>
+    <div class="row">
+      <article class="col-sm-9">
+        <ng-view></ng-view>
+      </article>
+      <aside class="col-sm-3" ng-include="'danhmucmonhoc.html'"></aside>
+    </div>
+    <footer class="row">
+      <p class="m-auto text-center text-white">FPT Polytechnic &copy; 2017. All rights reserved</p>
+    </footer>
+  </div>
+</body>
+
+</html>
+<script>
+  var app = angular.module("lab8", ["ngRoute"]);
+  app.controller("lab8", function ($scope, $interval, $rootScope) {
+    $scope.time = new Date();
+    $interval(function () {
+      $scope.time = new Date();
+    }, 1000);
+
+  });
+  app.config(function ($routeProvider) {
+    $routeProvider
+      .when("/gioithieu", { templateUrl: "gioithieu.html" })
+      .when("/lienhe", { templateUrl: "lienhe.html" })
+      .when("/gopy", { templateUrl: "gopy.html" })
+      .when("/monhoc", {templateUrl: "monhoc.html"})
+      .when("/hoidap", { templateUrl: "hoidap.html" })
+      .when("/dangxuat", { templateUrl: "dangnhap.html", controller: "tk" })
+      .when("/doimatkhau", { templateUrl: "doimatkhau.html", controller: "tk" })
+      .when("/capnhattaikhoan", { templateUrl: "capnhattaikhoan.html", controller: "tk" })
+      .when("/tracnghiem/:idMH/:tenMH", { templateUrl: "tracnghiem.html", controller: "tnctrl" })
+      .otherwise({ templateUrl: "trangchu.html" })
+  });
+  app.controller("tnctrl", function ($scope, $http, $routeParams) {
+    $scope.caccauhoi = [];
+    $scope.idMH = $routeParams.idMH;
+    $scope.tenMH = $routeParams.tenMH;
+    $http.get("database/" + $scope.idMH + ".js").then(
+      function (d) { $scope.caccauhoi = d.data; },
+      function (d) { alert("Lỗi"); }
+    );
+  });
+  app.controller("lab8", function ($scope, $http) {
+    $scope.cacmonhoc = [];
+    $http.get("monhoc.js").then(function (d) { $scope.cacmonhoc = d.data; },
+      function (d) { alert("Lỗi"); }
+    );
+  })
+  app.controller("tnctrl", function ($scope, $rootScope, $http, $routeParams) {
+    $scope.tenMH = $routeParams.tenMH;
+    $scope.start = 0;
+    $scope.pageSize = 1;
+    $scope.diem = 0;
+    $scope.idMH = $routeParams.idMH;
+    $scope.caccauhoi = [];
+    $http.get("database/" + $scope.idMH + ".js").then(
+      function (d) { $scope.caccauhoi = d.data; },
+      function (d) {
+        alert("Lỗi")
+          ;
+      }
+    );
+
+    $scope.next = function () {
+      if ($scope.start < $scope.caccauhoi.length - $scope.pageSize)
+        $scope.start += $scope.pageSize;
+    }
+    $scope.prev = function () {
+      if ($scope.start > 0)
+        $scope.start -= $scope.pageSize;
+      console.log($scope.start);
+    }
+    $scope.first = function () {
+      $scope.start = 0;
+    }
+    $scope.last = function () {
+      sotrang = Math.ceil($scope.caccauhoi.length / $scope.pageSize);
+      $scope.start = (sotrang - 1) * $scope.pageSize;
+    }
+
+    // thời gian nè :
+    $scope.countdownTimer = function () {
+      var timeLeft = 60;
+      var elem = document.getElementById('some_div');
+      var timerId = setInterval(countdown, 1000);
+      function countdown() {
+        elem.innerHTML = 'Thời Gian : ' + timeLeft + 's';
+        timeLeft--;
+        if (timeLeft == -1) {
+          clearTimeout(timerId);
+        }
+      }
+    }
+    $scope.KiemtraPA = function (idPA, idPADUNG) {
+      if (idPA == idPADUNG) {
+        alert('Chính Xác')
+        $scope.diem++;
+        $scope.next()
+      }
+      else {
+        alert('Sai Rồi')
+        $scope.next();
+      }
+    }
+  });
+  app.controller("tk", function ($scope, $http, $rootScope, $routeParams) {
+    $scope.username = sessionStorage.getItem('username');
+    $scope.password = sessionStorage.getItem('password');
+    $scope.Student = {};
+    $scope.Students = [];
+
+    $http.get("db/Students.js").then(
+      function (d) { $scope.Students = d.data; },
+      function (d) { alert("lỗi"); });
+
+    $scope.dangky = function () {
+      $scope.Students.push($scope.Student);
+      alert("Bạn đã đăng ký thành công " + $scope.Student.username);
+      document.location.href = '/index.html';
+
+    };
+
+    $scope.dangnhap = function () {
+      var timduoc = false;
+      for (var i = 0; i < $scope.Students.length; i++) {
+        if ($scope.Students[i].username == $scope.Student.username
+          && $scope.Students[i].password == $scope.Student.password) {
+          timduoc = true;
+          $scope.Student = angular.copy($scope.Students[i]);
+          break;
+        }
+      }
+
+      if (timduoc == true) {
+        $rootScope.dangnhaproi = true;
+        $scope.username = $scope.Student.username;
+        sessionStorage.setItem("username", $scope.username);
+        sessionStorage.setItem("user", JSON.stringify($scope.Student));
+        alert('Đăng nhập thành công');
+        document.location.href = '/index.html';
+      }
+      else {
+        $rootScope.dangnhaproi = false;
+        sessionStorage.setItem('user', null);
+        alert("Không thành công")
+        document.location.href = '/index.html#!/dangnhap';
+      }
+    }
+    $scope.dangxuat = function () {
+      $Scope.username = "";
+      $scope.dangnhaproi = false;
+      sessionStorage.removeItem("username");
+      sessionStorage.removeItem('user');
+      document.location.href = '/index.html#!/dangnhap';
+    } 
+  })
+
+
+</script>
+<script src="db/Subjects.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"> </script>
+<script src=https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js></script>

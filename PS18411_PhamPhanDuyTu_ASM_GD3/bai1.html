@@ -1,0 +1,92 @@
+<head>
+  <title>Tiêu đề trang</title>
+  <meta charset="utf-8" />
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+
+</head>
+<style>
+  #body{
+    margin-left: 600px;
+    margin-top: 50px;
+  }
+</style>
+<body ng-app="myapp" id="body">
+  <div ng-controller="myctrl1">
+    <form class="col-6  border border-success ">
+      <div class="bg-warning m- p-2  mx-n3 text-white font-weight-bold text-uppercase"> <i class="fas fa-list"></i> Form
+        thông tin sinh viên</div>
+
+      <div class="1 card-body  ">
+        <div class="form-group">
+          <label for="username"> <i class="fas fa-user"></i> Họ Và Tên: </label>
+          <input ng-model="$parent.student.fullname" type="text" class="form-control" ng-model="u" id="username" placeholder="Nhập họ và tên">
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1"> <i class="fas fa-calendar"></i> Ngày Sinh: </label>
+          <input ng-model="$parent.student.birthday" type="text" class="form-control" ng-model="p" id="exampleInputPassword1" placeholder="Nhập ngày sinh">
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword2"> <i class="fas fa-pen"></i> Điểm: </label>
+          <input ng-model="$parent.student.mark" type="number" class="form-control" ng-model="p" id="exampleInputPassword2" placeholder="Nhập điểm">
+        </div>
+        <div class="d-grid">
+          <button type="button" ng-click="save()" class="btn btn-primary btn-lg" id="save"> <i class="fas fa-save"></i> Lưu</button>
+          <button type="button" ng-click="cancel()" class="btn btn-danger btn-lg"> <i class="fas fa-window-close"></i> Hủy</button>
+        </div>
+        <hr>
+        <small class="ml-auto"><i>Chú ý: Nhập điểm là từ 0 đến 10, ngày sinh là: dd/mm/yyyy</i></small>
+      </div>
+    </form>
+  </div>
+  <div ng-controller="myctrl2">
+    <table class="table col-6 table-bordered">
+      <thead class="text-center bg-warning">
+      <tr>
+        <th scope="col">Họ và tên</th>
+        <th scope="col">Ngày sinh</th>
+        <th scope="col">Điểm</th>
+        <th scope="col">Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="sv in students">
+        <td>{{sv.fullname}}</td>
+        <td>{{sv.birthday}}</td>
+        <td>{{sv.mark}}</td>
+        <td><div class="text-center"><button class="btn btn-lg btn-light ml-3 text-primary" ng-click="edit($index)">Sửa</button></div></td>
+      </tr>
+</tbody>
+    </table>
+  </div>
+</body>
+
+<script>
+  var app = angular.module("myapp", []);
+  app.controller("myctrl1", function ($scope) {
+    $scope.save = function() {
+      $scope.$parent.students[$scope.$parent.index] = $scope.student;
+    }
+    $scope.cancel = function() {
+      $scope.$parent.student = angular.copy($scope.$parent.students[$scope.$parent.index]);
+    }
+  })
+  app.controller("myctrl2", function ($scope) {
+      $scope.$parent.students = [
+        { fullname: "Thi Hoài", birthday: "5/05/2000", mark: 8.5 },
+        { fullname: "Đỗ Đạt Cao", birthday: "24/03/2000", mark: 9 },
+        { fullname: "Đào Kho Báu", birthday: "27/04/2001", mark: 7.5 },
+        { fullname: "Mai Thanh Toán", birthday: "9/10/1999", mark: 6 },
+      ];
+      $scope.edit = function(chiso) {
+      $scope.$parent.index = chiso;
+      $scope.$parent.student = angular.copy($scope.$parent.students[chiso]);
+    }
+  })
+</script>
+
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"> </script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"> </script>
